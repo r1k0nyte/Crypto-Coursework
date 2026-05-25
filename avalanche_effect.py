@@ -6,9 +6,7 @@ from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
 
 
-# =========================================
 # BIT DIFFERENCE FUNCTION
-# =========================================
 
 def bit_difference(data1, data2):
 
@@ -23,18 +21,12 @@ def bit_difference(data1, data2):
     return diff
 
 
-# =========================================
 # TEST DATA
-# =========================================
 
 data = b"Hello world 1234"
 
 
-# =========================================
 # AES
-# =========================================
-
-print("\n================ AES ================\n")
 
 aes_key1 = bytearray(get_random_bytes(32))
 aes_key2 = bytearray(aes_key1)
@@ -72,11 +64,7 @@ print(
 )
 
 
-# =========================================
 # DES
-# =========================================
-
-print("\n================ DES ================\n")
 
 des_key1 = bytearray(get_random_bytes(8))
 des_key2 = bytearray(des_key1)
@@ -121,11 +109,7 @@ print(
 )
 
 
-# =========================================
 # CHACHA20
-# =========================================
-
-print("\n============= ChaCha20 =============\n")
 
 chacha_key1 = bytearray(
     get_random_bytes(32)
