@@ -6,7 +6,9 @@ from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
 
 
+# =========================================
 # BIT DIFFERENCE FUNCTION
+# =========================================
 
 def bit_difference(data1, data2):
 
@@ -21,34 +23,36 @@ def bit_difference(data1, data2):
     return diff
 
 
+# =========================================
 # TEST DATA
+# =========================================
 
-original = b"Hello world 1234"
-modified = b"Jello world 1234"
+data = b"Hello world 1234"
 
 
+# =========================================
 # AES
+# =========================================
 
-aes_key = get_random_bytes(32)
+print("\n================ AES ================\n")
+
+aes_key1 = bytearray(get_random_bytes(32))
+aes_key2 = bytearray(aes_key1)
+
+aes_key2[0] ^= 0b00000001
 
 aes_cipher1 = AES.new(
-    aes_key,
-    AES.MODE_GCM
-)
-
-aes_ciphertext1, aes_tag1 = (
-    aes_cipher1.encrypt_and_digest(original)
+    bytes(aes_key1),
+    AES.MODE_ECB
 )
 
 aes_cipher2 = AES.new(
-    aes_key,
-    AES.MODE_GCM,
-    nonce=aes_cipher1.nonce
+    bytes(aes_key2),
+    AES.MODE_ECB
 )
 
-aes_ciphertext2, aes_tag2 = (
-    aes_cipher2.encrypt_and_digest(modified)
-)
+aes_ciphertext1 = aes_cipher1.encrypt(data)
+aes_ciphertext2 = aes_cipher2.encrypt(data)
 
 aes_difference = bit_difference(
     aes_ciphertext1,
@@ -68,30 +72,35 @@ print(
 )
 
 
+# =========================================
 # DES
+# =========================================
 
-des_key = get_random_bytes(8)
+print("\n================ DES ================\n")
+
+des_key1 = bytearray(get_random_bytes(8))
+des_key2 = bytearray(des_key1)
+
+des_key2[0] ^= 0b00000010
 
 des_cipher1 = DES.new(
-    des_key,
-    DES.MODE_CBC
-)
-
-padded_original = pad(original, 8)
-padded_modified = pad(modified, 8)
-
-des_ciphertext1 = des_cipher1.encrypt(
-    padded_original
+    bytes(des_key1),
+    DES.MODE_ECB
 )
 
 des_cipher2 = DES.new(
-    des_key,
-    DES.MODE_CBC,
-    iv=des_cipher1.iv
+    bytes(des_key2),
+    DES.MODE_ECB
+)
+
+padded_data = pad(data, 8)
+
+des_ciphertext1 = des_cipher1.encrypt(
+    padded_data
 )
 
 des_ciphertext2 = des_cipher2.encrypt(
-    padded_modified
+    padded_data
 )
 
 des_difference = bit_difference(
@@ -112,28 +121,40 @@ print(
 )
 
 
+# =========================================
 # CHACHA20
+# =========================================
 
-chacha_key = get_random_bytes(32)
+print("\n============= ChaCha20 =============\n")
+
+chacha_key1 = bytearray(
+    get_random_bytes(32)
+)
+
+chacha_key2 = bytearray(
+    chacha_key1
+)
+
+chacha_key2[0] ^= 0b00000001
 
 nonce = get_random_bytes(12)
 
 chacha_cipher1 = ChaCha20.new(
-    key=chacha_key,
+    key=bytes(chacha_key1),
+    nonce=nonce
+)
+
+chacha_cipher2 = ChaCha20.new(
+    key=bytes(chacha_key2),
     nonce=nonce
 )
 
 chacha_ciphertext1 = (
-    chacha_cipher1.encrypt(original)
-)
-
-chacha_cipher2 = ChaCha20.new(
-    key=chacha_key,
-    nonce=nonce
+    chacha_cipher1.encrypt(data)
 )
 
 chacha_ciphertext2 = (
-    chacha_cipher2.encrypt(modified)
+    chacha_cipher2.encrypt(data)
 )
 
 chacha_difference = bit_difference(
